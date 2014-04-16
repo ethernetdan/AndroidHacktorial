@@ -4,6 +4,12 @@ android {
     compileSdkVersion 19
     buildToolsVersion "19.0.1"
 
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 19

@@ -1,9 +1,15 @@
 package com.ampvita.tutorial.testapp;
 
+
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.database.DataSetObserver;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -16,14 +22,16 @@ public class MainActivity extends ListActivity {
 
     private static final String FIREBASE_URL = "https://hacktorial.firebaseio.com/";
 
-    private String username;
+    private static final String username = "dan";
     private Firebase fb;
+    private ChatListAdapter chatListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setTitle("Hey " + username + "!");
         fb = new Firebase(FIREBASE_URL).child("conversation");
 
         EditText inputText = (EditText)findViewById(R.id.messageInput);
@@ -36,17 +44,12 @@ public class MainActivity extends ListActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setupChat();
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         final ListView listView = getListView();
 
         chatListAdapter = new ChatListAdapter(fb.limit(50), this, R.layout.chat_message, username);
+        listView.setAdapter(chatListAdapter);
         chatListAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -56,11 +59,7 @@ public class MainActivity extends ListActivity {
         });
     }
 
-    private void setupChat() {
 
-        setTitle("Hey " + username + "!");
-
-    }
 
     private void sendMessage() {
         EditText inputText = (EditText)findViewById(R.id.messageInput);
@@ -71,6 +70,14 @@ public class MainActivity extends ListActivity {
             // Create a new, auto-generated child of that chat location, and save our chat data there
             fb.push().setValue(chat);
             inputText.setText("");
+
+            try {
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                r.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
